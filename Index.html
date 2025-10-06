@@ -1,1 +1,84 @@
 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vibe Notebook</title>
+  <meta name="description" content="Tiny web-native sketches in mood, motion, and type.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: hsl(45 33% 96%);
+      --ink: hsl(215 33% 12%);
+      --accent: hsl(12 75% 52%);
+      --muted: hsl(215 16% 60%);
+      --radius: 16px;
+      --shadow: 0 10px 25px hsl(215 30% 10% / .08);
+    }
+    @media (prefers-color-scheme: dark){
+      :root{ --bg:hsl(220 15% 10%); --ink:hsl(210 20% 92%); --muted:hsl(210 10% 65%); }
+    }
+    *{ box-sizing:border-box }
+    body{
+      margin:0; background:var(--bg); color:var(--ink);
+      font-family:Inter, system-ui, sans-serif; line-height:1.6;
+      display:flex; flex-direction:column; gap:2rem;
+    }
+    header, main, footer{ width:min(900px, 92%); margin-inline:auto }
+    header{ margin-top:2rem; }
+    h1{ font:700 2.2rem/1 "Playfair Display", serif; margin:.2rem 0 0 }
+    .card{
+      background:white; color:black; padding:1.25rem 1.25rem 1.5rem;
+      border-radius:var(--radius); box-shadow:var(--shadow);
+    }
+    @media (prefers-color-scheme: dark){
+      .card{ background:hsl(225 18% 14%); color:var(--ink); }
+    }
+    details{ border:1px dashed var(--muted); padding:.75rem 1rem; border-radius:12px }
+    summary{ cursor:pointer; font-weight:700 }
+    img{ max-width:100%; border-radius:12px; display:block }
+    a{ color:var(--accent) }
+    .note{ color:var(--muted); font-size:.95rem }
+    .poem{ white-space:pre-wrap; letter-spacing:.2px }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Five-line sketch</h1>
+    <p class="note">Replace the text below with your piece + an image with alt text.</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="poem">
+cold kettle light / a blue corner of the room
+traffic braids the rain into ribbon
+the lift forgets my floor
+I breathe in time with the router
+and wait for the page to arrive
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Optional reveal</h2>
+      <details>
+        <summary>Tap to open a second stanza</summary>
+        <p class="poem">the cursor blinks like a lighthouse / patient / patient</p>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>One photo that holds the vibe</h2>
+      <img src="https://images.unsplash.com/photo-1526336024174-e58f5cdd8e13?q=80&w=1200&auto=format&fit=crop"
+           alt="Rainy window lit by a cool blue screen glow">
+    </section>
+  </main>
+
+  <footer class="note" style="padding:2rem 0 3rem">
+    &copy; <span id="y"></span> Your Name
+  </footer>
+  <script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+</body>
+</html>
