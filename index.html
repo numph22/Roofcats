@@ -2,26 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Animated Woman + Backpack + Interactive Text</title>
+  <title>Woman + Backpack + Click Animation</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: white;
+      font-family: "Georgia", serif; /* more formal */
       overflow: hidden;
-      font-family: "Times New Roman", Georgia, serif; /* more formal font */
+      position: relative;
     }
 
-    /* Background cityscape image */
+    /* Cityscape background */
     body::before {
       content: "";
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      width: 100vw;
+      height: 100vh;
       background: url('cityscape.jpg') center center / cover no-repeat;
-      filter: grayscale(100%) brightness(0.8);
+      filter: grayscale(100%) brightness(0.7);
       z-index: -1;
     }
 
@@ -31,8 +31,7 @@
       top: 20px;
       width: 100%;
       text-align: center;
-      font-size: 1.2em; /* smaller font size */
-      font-weight: normal;
+      font-size: 1.2em; /* smaller size */
       color: #222;
       user-select: none;
     }
@@ -41,6 +40,7 @@
       display: inline-block;
       cursor: pointer;
       animation: shake 0.5s infinite;
+      position: relative;
     }
 
     @keyframes shake {
@@ -58,6 +58,7 @@
       transform: translateX(-50%);
       width: 200px;
       height: 400px;
+      pointer-events: none; /* so click passes through if needed */
     }
 
     .leg-left, .leg-right {
@@ -75,21 +76,9 @@
       100% { transform: rotate(20deg); }
     }
 
-    /* Animation path for the "random" word moving into backpack */
-    @keyframes move-into-backpack {
-      0% {
-        transform: translate(0, 0) scale(1);
-        opacity: 1;
-      }
-      80% {
-        /* mid-flight */
-        transform: translate(var(--dx), var(--dy)) scale(0.5);
-        opacity: 1;
-      }
-      100% {
-        transform: translate(var(--dx), var(--dy)) scale(0.2);
-        opacity: 0;
-      }
+    /* Styles for moving "random" into backpack */
+    .moving {
+      transition: transform 1s ease-in-out, opacity 1s ease-in-out;
     }
   </style>
 </head>
@@ -100,7 +89,7 @@
   </div>
 
   <div class="figure-container">
-    <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg">
+    <svg viewBox="0 0 200 400" xmlns="http://www.w3.org/2000/svg" id="figureSvg">
       <!-- Head -->
       <circle cx="100" cy="60" r="40" fill="#fde0cc" stroke="#000" stroke-width="2" />
       <!-- Hair -->
@@ -109,14 +98,16 @@
       <!-- Torso -->
       <rect x="85" y="100" width="30" height="80" fill="#4a90e2" stroke="#000" stroke-width="2" />
       <!-- Backpack -->
-      <rect x="115" y="110" width="40" height="60" fill="#888" stroke="#000" stroke-width="2" rx="5" id="backpack" />
-      <path d="M115,110 L110,130 L110,160 L115,170"
-            stroke="#000" stroke-width="2" fill="none" />
-      <path d="M155,110 L160,130 L160,160 L155,170"
-            stroke="#000" stroke-width="2" fill="none" />
+      <g id="backpackGroup">
+        <rect x="115" y="110" width="40" height="60" fill="#888" stroke="#000" stroke-width="2" rx="5" id="backpackRect"/>
+        <path d="M115,110 L110,130 L110,160 L115,170"
+              stroke="#000" stroke-width="2" fill="none" />
+        <path d="M155,110 L160,130 L160,160 L155,170"
+              stroke="#000" stroke-width="2" fill="none" />
+      </g>
       <!-- Arms -->
-      <path d="M85,110 C60,150 80,180 85,200" stroke="#f5c6a5" stroke-width="12" stroke-linecap="round"/>
-      <path d="M115,110 C140,150 120,180 115,200" stroke="#f5c6a5" stroke-width="12" stroke-linecap="round"/>
+      <path d="M85,110 C60,150 80,180 85,200" stroke="#fde0cc" stroke-width="12" stroke-linecap="round"/>
+      <path d="M115,110 C140,150 120,180 115,200" stroke="#fde0cc" stroke-width="12" stroke-linecap="round"/>
       <!-- Legs -->
       <g transform="translate(100,180)">
         <g class="leg-left">
@@ -140,26 +131,33 @@
 
   <script>
     const shakeWord = document.getElementById('shakeWord');
-    const backpack = document.getElementById('backpack');
+    const backpackRect = document.getElementById('backpackRect');
 
-    shakeWord.addEventListener('click', (evt) => {
+    shakeWord.addEventListener('click', () => {
       // get bounding boxes
       const wordRect = shakeWord.getBoundingClientRect();
-      const backpackRect = backpack.getBoundingClientRect();
+      const bpRect = backpackRect.getBoundingClientRect();
 
-      // compute delta needed from word → backpack center
-      const dx = (backpackRect.left + backpackRect.width/2) - (wordRect.left + wordRect.width/2);
-      const dy = (backpackRect.top + backpackRect.height/2) - (wordRect.top + wordRect.height/2);
+      // compute center deltas
+      const wordCenterX = wordRect.left + wordRect.width / 2;
+      const wordCenterY = wordRect.top + wordRect.height / 2;
+      const bpCenterX = bpRect.left + bpRect.width / 2;
+      const bpCenterY = bpRect.top + bpRect.height / 2;
 
-      // set CSS variables on the element to animate
-      shakeWord.style.setProperty('--dx', dx + 'px');
-      shakeWord.style.setProperty('--dy', dy + 'px');
+      const dx = bpCenterX - wordCenterX;
+      const dy = bpCenterY - wordCenterY;
 
-      // apply animation
-      shakeWord.style.animation = 'none';  // reset
-      // force reflow
-      void shakeWord.offsetWidth;
-      shakeWord.style.animation = 'move-into-backpack 1s forwards';
+      // apply moving
+      shakeWord.classList.add('moving');
+      shakeWord.style.transform = `translate(${dx}px, ${dy}px) scale(0.2)`;
+      shakeWord.style.opacity = '0';
+
+      // Optionally, after animation, you can hide it completely or reset
+      setTimeout(() => {
+        // you could reset or leave it hidden
+        // For example:
+        // shakeWord.style.display = 'none';
+      }, 1100);
     });
   </script>
 
